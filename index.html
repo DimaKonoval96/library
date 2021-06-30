@@ -8,7 +8,24 @@
 		<link rel="stylesheet" href="css/styles.css" type="text/css" />
 	</head>
 	<body>
-		<ul class="booksList"></ul>
+		<div class="cardsList">
+		  
+		  <div class="card">
+		    <div class="imgContainer"><img></div>
+		    <div class="cardContent">
+		      <p class="title">Title</p>
+		      <p class="author">Author</p>
+		      <p class="pagesNumber">Number of pages</p>
+		      <p>Read already?</p>
+		      
+		        <label class="switch">
+              <input type="checkbox">
+              <span class="slider round"></span>
+            </label>
+          
+      </div>
+		  </div>
+		</div>
 		<button type="button" class="addBookBtn">Add Book</button>
 		<script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-app.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-firestore.js"></script>
