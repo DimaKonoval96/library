@@ -13,10 +13,12 @@ firebase.initializeApp(firebaseConfig);
 firebase.analytics();
 const db = firebase.firestore();
 
-const library = [];
+let library = [];
 
 const addBookBtn = document.querySelector('.addBookBtn');
 const cardsList = document.querySelector('.cardsList');
+
+addBookBtn.addEventListener('click', addBookHandler);
 
 // Generate and return unique id
 
@@ -49,6 +51,19 @@ function addBookToLibrary() {
 
 //Walk through the library and display every object as a list item
 displayLibrary = (library) => {};
+
+const deleteHandler = (ev) =>{
+  if(ev.target.className.includes('delete')){
+    const id = ev.target.parentNode.id;
+    db.collection('books').doc(id).delete().then(() => {
+      library = library.filter((book) => book.id != id);
+      console.log(library)});
+    ev.currentTarget.removeChild(ev.target.parentNode);
+  }
+}
+
+
+cardsList.addEventListener('click', deleteHandler);
 
 function getBooks() {
 	db.collection('books')
@@ -88,6 +103,7 @@ function createCard(props){
  
  const lSwitch = document.createElement('label');
  lSwitch.classList.add('switch');
+ 
  const input = document.createElement('input');
  
  input.checked = isRead;
@@ -97,6 +113,9 @@ function createCard(props){
  sSlider.classList.add('round');
  lSwitch.append(input, sSlider);
  card.append(pTitle, pAuthor,pPages, pIsRead, lSwitch);
+ const deleteIcon = '<i class="fas fa-minus-circle delete"></i>';
+
+ card.innerHTML += deleteIcon;
  return card;
 }
 getBooks();
