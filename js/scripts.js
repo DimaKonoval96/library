@@ -14,10 +14,42 @@ firebase.analytics();
 const db = firebase.firestore();
 
 let library = [];
-
+const bookObj = {};
 const addBookBtn = document.querySelector('.addBookBtn');
 const cardsList = document.querySelector('.cardsList');
+const inputs = document.querySelectorAll('form input');
 
+
+inputs.forEach(input => {
+    if(input.type == 'checkbox'){
+      input.addEventListener('click', (ev) =>{
+        bookObj[ev.target.name] = ev.target.checked;
+      })
+    } 
+    else {
+      input.addEventListener('change', (ev) =>{
+          bookObj[ev.target.name] = ev.target.value;
+          console.log(bookObj);
+      });
+    }
+})
+
+const addBookHandler = (ev) => {
+  ev.preventDefault();
+  if(!('isRead' in bookObj) ){
+    bookObj.isRead = false;
+  }
+  db.collection('books').add(bookObj)
+    .then(doc => {
+      bookObj.id = doc.id;
+      library.push(bookObj);
+      cardsList.append(createCard(bookObj));
+    })
+    .catch(error => {
+      console.error('Error adding document: ', error);
+    })
+    
+}
 addBookBtn.addEventListener('click', addBookHandler);
 
 // Generate and return unique id
@@ -39,15 +71,6 @@ Book.prototype.info = function () {
 };
 
 // Get user input, create book object and add to the library array
-function addBookToLibrary() {
-	const title = prompt('Title: ');
-	const author = prompt('Author: ');
-	const pages = prompt('Number of pages: ');
-	let isRead = prompt('Is already read?(y/n)');
-	isRead = isRead === 'y' || isRead === 'yes' ? true : false;
-
-	library.push(new Book(title, author, pages, isRead));
-}
 
 //Walk through the library and display every object as a list item
 displayLibrary = (library) => {};
@@ -105,20 +128,23 @@ function createCard(props){
  lSwitch.classList.add('switch');
  
  const input = document.createElement('input');
+
  
- input.checked = isRead;
- input.type = 'checkbox';
  const sSlider = document.createElement('span');
  sSlider.classList.add('slider');
  sSlider.classList.add('round');
  lSwitch.append(input, sSlider);
+ input.type = 'checkbox';
+ input.checked = isRead;
  card.append(pTitle, pAuthor,pPages, pIsRead, lSwitch);
  const deleteIcon = '<i class="fas fa-minus-circle delete"></i>';
 
  card.innerHTML += deleteIcon;
+ console.log(input, input.checked, isRead);
  return card;
 }
 getBooks();
 
 /*console.log(createCard({title:'Martin Eden', author: 'Jack London', pages: 235, isRead: false}));
 */
+console.log(library)

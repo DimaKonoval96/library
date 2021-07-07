@@ -12,6 +12,27 @@
 		<div class="cardsList">
 		  
 		</div>
+		<form>
+		  <label>
+		   <p> Title:</p>
+		    <input type='text' name='title' id='title'/>
+		  </label>
+		  <label>
+		    <p>Author:</p>
+		    <input type='text' name='author'/>
+		  </label>
+		  <label>
+		   <p>Number of Pages:</p>
+		    <input type ='number' name='pages' />
+		  </label>
+		  <span>Have already read?</span>
+		  <label class='switch'>
+		    
+		      <input checked type="checkbox" name='isRead'>
+		      <span class="slider round"></span>
+		    
+		  </label>
+		</form>
 		<button type="button" class="addBookBtn">Add Book</button>
 		<script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-app.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-firestore.js"></script>
