@@ -13,6 +13,7 @@ firebase.initializeApp(firebaseConfig);
 firebase.analytics();
 const db = firebase.firestore();
 
+let tmp;
 let library = [];
 const bookObj = {};
 const addBookBtn = document.querySelector('.addBookBtn');
@@ -22,7 +23,7 @@ const inputs = document.querySelectorAll('form input');
 
 inputs.forEach(input => {
     if(input.type == 'checkbox'){
-      input.addEventListener('click', (ev) =>{
+      input.addEventListener('change', (ev) =>{
         bookObj[ev.target.name] = ev.target.checked;
       })
     } 
@@ -78,8 +79,10 @@ displayLibrary = (library) => {};
 const deleteHandler = (ev) =>{
   if(ev.target.className.includes('delete')){
     const id = ev.target.parentNode.id;
+    console.log(id)
+    library = library.filter((book) => book.id != id);
     db.collection('books').doc(id).delete().then(() => {
-      library = library.filter((book) => book.id != id);
+      
       console.log(library)});
     ev.currentTarget.removeChild(ev.target.parentNode);
   }
@@ -109,6 +112,8 @@ function getBooks() {
 
 function createCard(props){
   const {title, author, isRead, pages, id} = props;
+  tmp = isRead;
+  console.log('tmp=>',tmp)
   const card = document.createElement('div');
   card.className = 'card';
   card.setAttribute('id', id);
@@ -126,21 +131,20 @@ function createCard(props){
  
  const lSwitch = document.createElement('label');
  lSwitch.classList.add('switch');
- 
- const input = document.createElement('input');
 
- 
  const sSlider = document.createElement('span');
+ const checked = isRead ? 'checked' : '';
+ const input = `<input type="checkbox" ${checked} name="isRead">`;
+ lSwitch.innerHTML += input;
  sSlider.classList.add('slider');
  sSlider.classList.add('round');
- lSwitch.append(input, sSlider);
- input.type = 'checkbox';
- input.checked = isRead;
+ lSwitch.append(sSlider);
+ 
  card.append(pTitle, pAuthor,pPages, pIsRead, lSwitch);
- const deleteIcon = '<i class="fas fa-minus-circle delete"></i>';
 
+
+ const deleteIcon = '<i class="fas fa-minus-circle delete"></i>';
  card.innerHTML += deleteIcon;
- console.log(input, input.checked, isRead);
  return card;
 }
 getBooks();
