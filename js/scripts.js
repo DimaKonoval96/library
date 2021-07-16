@@ -13,7 +13,7 @@ firebase.initializeApp(firebaseConfig);
 firebase.analytics();
 const db = firebase.firestore();
 
-let tmp;
+
 let library = [];
 const bookObj = {};
 const addBookBtn = document.querySelector('.addBookBtn');
@@ -30,13 +30,23 @@ inputs.forEach(input => {
     else {
       input.addEventListener('change', (ev) =>{
           bookObj[ev.target.name] = ev.target.value;
-          console.log(bookObj);
       });
     }
 })
 
+const isValid = () => {
+  let isEmpty = false;
+  inputs.forEach(input => {
+    if(input.type != 'checkbox'  && input.value == ''){
+      isEmpty = true;
+    }
+  });
+  return !isEmpty;
+}
+
 const addBookHandler = (ev) => {
   ev.preventDefault();
+  if(!isValid()) return;
   if(!('isRead' in bookObj) ){
     bookObj.isRead = false;
   }
@@ -45,6 +55,13 @@ const addBookHandler = (ev) => {
       bookObj.id = doc.id;
       library.push(bookObj);
       cardsList.append(createCard(bookObj));
+      inputs.forEach(input => {
+        if(input.type != 'checkbox') {input.value = '';
+        }
+        else {
+          input.checked = false;
+        }
+      })
     })
     .catch(error => {
       console.error('Error adding document: ', error);
@@ -79,7 +96,6 @@ displayLibrary = (library) => {};
 const deleteHandler = (ev) =>{
   if(ev.target.className.includes('delete')){
     const id = ev.target.parentNode.id;
-    console.log(id)
     library = library.filter((book) => book.id != id);
     db.collection('books').doc(id).delete().then(() => {
       
@@ -112,8 +128,6 @@ function getBooks() {
 
 function createCard(props){
   const {title, author, isRead, pages, id} = props;
-  tmp = isRead;
-  console.log('tmp=>',tmp)
   const card = document.createElement('div');
   card.className = 'card';
   card.setAttribute('id', id);
@@ -151,4 +165,4 @@ getBooks();
 
 /*console.log(createCard({title:'Martin Eden', author: 'Jack London', pages: 235, isRead: false}));
 */
-console.log(library)
+console.log(library);
