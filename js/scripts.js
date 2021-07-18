@@ -94,6 +94,7 @@ Book.prototype.info = function () {
 displayLibrary = (library) => {};
 
 const deleteHandler = (ev) =>{
+  
   if(ev.target.className.includes('delete')){
     const id = ev.target.parentNode.id;
     library = library.filter((book) => book.id != id);
@@ -101,6 +102,11 @@ const deleteHandler = (ev) =>{
       
       console.log(library)});
     ev.currentTarget.removeChild(ev.target.parentNode);
+  } else if(ev.target.className.includes('isRead')){
+    const id = ev.target.parentNode.parentNode.id;
+    db.collection('books').doc(id).set({
+      isRead: ev.target.checked
+    }, {merge: true})
   }
 }
 
@@ -148,7 +154,7 @@ function createCard(props){
 
  const sSlider = document.createElement('span');
  const checked = isRead ? 'checked' : '';
- const input = `<input type="checkbox" ${checked} name="isRead">`;
+ const input = `<input type="checkbox" ${checked} name="isRead" class='isRead'>`;
  lSwitch.innerHTML += input;
  sSlider.classList.add('slider');
  sSlider.classList.add('round');
