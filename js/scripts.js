@@ -13,11 +13,24 @@ firebase.initializeApp(firebaseConfig);
 firebase.analytics();
 const db = firebase.firestore();
 
-let library = [];
+const library = [];
+
+// Book Form and Cards
 const bookObj = new Book();
 const addBookBtn = document.querySelector(".addBookBtn");
 const cardsList = document.querySelector(".cardsList");
-const inputs = document.querySelectorAll("form input");
+const inputs = document.querySelectorAll("form#addBookForm input");
+
+// Sign Up
+const currUser = {};
+const signUpForm = document.querySelector("#signUpForm");
+const signUpInputs = signUpForm.querySelectorAll("input");
+const emailInput = signUpForm.querySelector('input[name="email"]');
+const passwdInput = signUpForm.querySelector('input[name="password"');
+const passwdComfirmInput = signUpForm.querySelector(
+  'input[name="passwordConfirm"'
+);
+const signUpBtn = signUpForm.querySelector('button[type="submit"]');
 
 // Validator
 const isValid = () => {
@@ -149,12 +162,22 @@ const deleteToggleHandler = (ev) => {
 // Event Listeners
 inputs.forEach((input) => {
   input.addEventListener("change", (ev) => {
-    const inputValue =
-      input.type == "checkbox" ? ev.target.checked : ev.target.value;
+    let inputValue;
+    if (input.type == "checkbox") {
+      inputValue = ev.target.checked;
+    } else {
+      inputValue = ev.target.value;
+    }
     bookObj[ev.target.name] = inputValue;
   });
 });
 cardsList.addEventListener("click", deleteToggleHandler);
 addBookBtn.addEventListener("click", addBookHandler);
 
+signUpInputs.forEach((input) => {
+  input.addEventListener("change", (ev) => {
+    currUser[ev.target.name] = ev.target.value;
+    console.log(currUser);
+  });
+});
 getBooks();
