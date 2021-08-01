@@ -20,11 +20,11 @@
       </label>
       <label>
         <p>Author:</p>
-        <input type="text" name="author" />
+        <input type="text" name="author" title="author" id="author" />
       </label>
       <label>
         <p>Number of Pages:</p>
-        <input type="number" name="pages" />
+        <input type="number" name="pages" id="pages" />
       </label>
       <span>Have already read?</span>
       <label class="switch">
@@ -39,6 +39,10 @@
     <form id="signUpForm">
       <h3>Sign Up</h3>
       <label>
+        <p>Name:</p>
+        <input type="text" name="name" />
+      </label>
+      <label>
         <p>Email:</p>
         <input type="email" name="email" />
       </label>
@@ -52,17 +56,17 @@
       </label>
       <div>
         <button type="submit">Sign Up</button>
+        <button name="signUpGoogleBtn">Sign up with Google</button>
       </div>
     </form>
-    <script src="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.js"></script>
-    <link
-      type="text/css"
-      rel="stylesheet"
-      href="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.css"
-    />
+
+    <div id="currUser">
+      <p class="currUserName"></p>
+    </div>
     <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-auth.js"></script>
     <script src="js/scripts.js"></script>
   </body>
 </html>

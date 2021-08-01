@@ -8,21 +8,18 @@ var firebaseConfig = {
   appId: "1:668802344734:web:7452e02d202a4ae64b4b0f",
   measurementId: "G-MYZHW83EVP",
 };
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 firebase.analytics();
-const db = firebase.firestore();
 
-const library = [];
+let library = [];
 
 // Book Form and Cards
-const bookObj = new Book();
 const addBookBtn = document.querySelector(".addBookBtn");
 const cardsList = document.querySelector(".cardsList");
 const inputs = document.querySelectorAll("form#addBookForm input");
 
 // Sign Up
-const currUser = {};
+let user = {};
 const signUpForm = document.querySelector("#signUpForm");
 const signUpInputs = signUpForm.querySelectorAll("input");
 const emailInput = signUpForm.querySelector('input[name="email"]');
@@ -31,7 +28,9 @@ const passwdComfirmInput = signUpForm.querySelector(
   'input[name="passwordConfirm"'
 );
 const signUpBtn = signUpForm.querySelector('button[type="submit"]');
-
+const signUpWithGoogleBtn = signUpForm.querySelector(
+  'button[name="signUpGoogleBtn"]'
+);
 // Validator
 const isValid = () => {
   let isEmpty = false;
@@ -43,51 +42,65 @@ const isValid = () => {
   return !isEmpty;
 };
 
-// Book constractor
-function Book() {}
-
-function displayCards() {
-  const fragment = document.createDocumentFragment();
-
-  const cards = library.forEach((book) => {
-    fragment.appendChild(createCard(book));
-  });
-  cardsList.append(fragment);
+// Book class
+class Book {
+  constructor(title, author, pages, isRead) {
+    this.title = title;
+    this.author = author;
+    this.pages = pages;
+    this.isRead = isRead;
+  }
 }
 
-function createCard(props) {
-  const { title, author, isRead, pages, id } = props;
-  const card = document.createElement("div");
-  card.className = "card";
-  card.setAttribute("id", id);
-  const pTitle = document.createElement("p");
-  pTitle.textContent = title;
+// UI
+class BookUI {
+  static createCard(props) {
+    const { title, author, isRead, pages, id } = props;
+    const card = document.createElement("div");
+    card.className = "card";
+    card.setAttribute("id", id);
+    const checked = isRead ? "checked" : "";
 
-  const pAuthor = document.createElement("p");
-  pAuthor.textContent = author;
+    card.innerHTML = `
+      <p>${title}</p>
+      <p>${author}</p>
+      <p>${pages}</p>
+      <p>Have already read?</p>
+      <label class='switch'>
+        <input type="checkbox" ${checked} name="isRead" class='isRead'>
+        <span class='slider round'></span>
+      </label>
+      <i class="fas fa-minus-circle delete"></i>`;
+    return card;
+  }
 
-  const pPages = document.createElement("p");
-  pPages.textContent = `${pages} pages`;
+  static displayCards() {
+    const fragment = document.createDocumentFragment();
 
-  const pIsRead = document.createElement("p");
-  pIsRead.textContent = "Have already read?";
+    const cards = library.forEach((book) => {
+      fragment.appendChild(this.createCard(book));
+    });
+    cardsList.append(fragment);
+  }
+}
 
-  const lSwitch = document.createElement("label");
-  lSwitch.classList.add("switch");
+class Storage {
+  db = firebase.firestore();
 
-  const sSlider = document.createElement("span");
-  const checked = isRead ? "checked" : "";
-  const input = `<input type="checkbox" ${checked} name="isRead" class='isRead'>`;
-  lSwitch.innerHTML += input;
-  sSlider.classList.add("slider");
-  sSlider.classList.add("round");
-  lSwitch.append(sSlider);
-
-  card.append(pTitle, pAuthor, pPages, pIsRead, lSwitch);
-
-  const deleteIcon = '<i class="fas fa-minus-circle delete"></i>';
-  card.innerHTML += deleteIcon;
-  return card;
+  getBooks() {
+    this.db
+      .collection("books")
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          const id = doc.id;
+          library.push({ id, ...doc.data() });
+        });
+      })
+      .then(() => {
+        BookUI.displayCards();
+      });
+  }
 }
 
 function makeInputsEmpty(inputs) {
@@ -100,33 +113,23 @@ function makeInputsEmpty(inputs) {
   });
 }
 
-function getBooks() {
-  db.collection("books")
-    .get()
-    .then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        const id = doc.id;
-        library.push({ id, ...doc.data() });
-      });
-    })
-    .then(() => {
-      displayCards();
-    });
-}
-
 // Event handlers
 const addBookHandler = (ev) => {
   ev.preventDefault();
   if (!isValid()) return;
-  if (!("isRead" in bookObj)) {
-    bookObj.isRead = false;
-  }
+  const title = document.querySelector("input#title").value;
+  const author = document.querySelector("input#author").value;
+  const pages = document.querySelector("input#pages").value;
+  const isRead = document.querySelector("input#isRead").checked;
+
+  const book = new Book(title, author, pages, isRead);
+
   db.collection("books")
-    .add(Object.assign({}, bookObj))
+    .add(Object.assign({}, book))
     .then((doc) => {
-      bookObj.id = doc.id;
-      library.push(bookObj);
-      cardsList.append(createCard(bookObj));
+      book.id = doc.id;
+      library.push(book);
+      cardsList.append(BookUI.createCard(book));
       makeInputsEmpty(inputs);
     })
     .catch((error) => {
@@ -159,25 +162,64 @@ const deleteToggleHandler = (ev) => {
   }
 };
 
-// Event Listeners
-inputs.forEach((input) => {
-  input.addEventListener("change", (ev) => {
-    let inputValue;
-    if (input.type == "checkbox") {
-      inputValue = ev.target.checked;
-    } else {
-      inputValue = ev.target.value;
-    }
-    bookObj[ev.target.name] = inputValue;
-  });
-});
+function signUpBtnHandler(ev) {
+  ev.preventDefault();
+  firebase
+    .auth()
+    .createUserWithEmailAndPassword(user.email, user.password)
+    .then((userCredential) => {
+      // Signed in
+      user.push(userCredential.user);
+      // ...
+    })
+    .catch((error) => {
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      // ..
+    });
+}
+
+function signUpWithGoogleHandler(ev) {
+  ev.preventDefault();
+  var provider = new firebase.auth.GoogleAuthProvider();
+  firebase
+    .auth()
+    .signInWithPopup(provider)
+    .then((result) => {
+      /** @type {firebase.auth.OAuthCredential} */
+      var credential = result.credential;
+
+      // This gives you a Google Access Token. You can use it to access the Google API.
+      var token = credential.accessToken;
+      // The signed-in user info.
+      user = result.user;
+      // ...
+      const currUserP = document.querySelector("p.currUserName");
+      currUserP.textContent = user.displayName;
+      console.log(user);
+    })
+    .catch((error) => {
+      // Handle Errors here.
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      // The email of the user's account used.
+      var email = error.email;
+      // The firebase.auth.AuthCredential type that was used.
+      var credential = error.credential;
+      console.log(errorCode, errorMessage);
+      // ...
+    });
+}
+
 cardsList.addEventListener("click", deleteToggleHandler);
 addBookBtn.addEventListener("click", addBookHandler);
 
 signUpInputs.forEach((input) => {
   input.addEventListener("change", (ev) => {
-    currUser[ev.target.name] = ev.target.value;
-    console.log(currUser);
+    user[ev.target.name] = ev.target.value;
   });
 });
-getBooks();
+signUpBtn.addEventListener("click", signUpBtnHandler);
+signUpWithGoogleBtn.addEventListener("click", signUpWithGoogleHandler);
+
+new Storage().getBooks();
