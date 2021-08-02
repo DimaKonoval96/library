@@ -74,6 +74,15 @@ class BookUI {
     return card;
   }
 
+  static removeCard(ev) {
+    ev.currentTarget.removeChild(ev.target.parentNode);
+  }
+
+  static addCard(book) {
+    cardsList.append(this.createCard(book));
+    makeInputsEmpty(inputs);
+  }
+
   static displayCards() {
     const fragment = document.createDocumentFragment();
 
@@ -84,10 +93,40 @@ class BookUI {
   }
 }
 
-class Storage {
-  db = firebase.firestore();
+class DB {
+  constructor() {
+    this.db = firebase.firestore();
+  }
+
+  addBook(book) {
+    this.db
+      .collection("books")
+      .add(Object.assign({}, book))
+      .then((doc) => {
+        book.id = doc.id;
+        library.push(book);
+        BookUI.addCard(book);
+      })
+      .catch((error) => {
+        console.error("Error adding document: ", error);
+      });
+  }
+
+  removeBook(id) {
+    this.db.collection("books").doc(id).delete();
+  }
+
+  updateIsRead(id, isRead) {
+    this.db.collection("books").doc(id).set(
+      {
+        isRead,
+      },
+      { merge: true }
+    );
+  }
 
   getBooks() {
+    console.log(this.db);
     this.db
       .collection("books")
       .get()
@@ -113,6 +152,8 @@ function makeInputsEmpty(inputs) {
   });
 }
 
+const db = new DB();
+
 // Event handlers
 const addBookHandler = (ev) => {
   ev.preventDefault();
@@ -124,34 +165,20 @@ const addBookHandler = (ev) => {
 
   const book = new Book(title, author, pages, isRead);
 
-  db.collection("books")
-    .add(Object.assign({}, book))
-    .then((doc) => {
-      book.id = doc.id;
-      library.push(book);
-      cardsList.append(BookUI.createCard(book));
-      makeInputsEmpty(inputs);
-    })
-    .catch((error) => {
-      console.error("Error adding document: ", error);
-    });
+  db.addBook(book);
 };
 
 function deleteHandler(ev) {
   const id = ev.target.parentNode.id;
   library = library.filter((book) => book.id != id);
-  db.collection("books").doc(id).delete();
-  ev.currentTarget.removeChild(ev.target.parentNode);
+  db.removeBook(id);
+  BookUI.removeCard(ev);
 }
 
 function toggleHandler(ev) {
   const id = ev.target.parentNode.parentNode.id;
-  db.collection("books").doc(id).set(
-    {
-      isRead: ev.target.checked,
-    },
-    { merge: true }
-  );
+  const isRead = ev.target.checked;
+  db.updateIsRead(id, isRead);
 }
 
 const deleteToggleHandler = (ev) => {
@@ -222,4 +249,4 @@ signUpInputs.forEach((input) => {
 signUpBtn.addEventListener("click", signUpBtnHandler);
 signUpWithGoogleBtn.addEventListener("click", signUpWithGoogleHandler);
 
-new Storage().getBooks();
+dbStorage.getBooks();
