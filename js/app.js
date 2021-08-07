@@ -19,7 +19,6 @@ const cardsList = document.querySelector(".cardsList");
 const inputs = document.querySelectorAll("form#addBookForm input");
 
 // Sign Up
-let user = {};
 const signUpForm = document.querySelector("#signUpForm");
 const signUpInputs = signUpForm.querySelectorAll("input");
 const emailInput = signUpForm.querySelector('input[name="email"]');
@@ -31,6 +30,10 @@ const signUpBtn = signUpForm.querySelector('button[type="submit"]');
 const signUpWithGoogleBtn = signUpForm.querySelector(
   'button[name="signUpGoogleBtn"]'
 );
+const signInForm = document.querySelector("#signInForm");
+const signInBtn = signInForm.querySelector('button[type="submit"]');
+const signOutBtn = document.querySelector("#signOut");
+
 // Validator
 const isValid = () => {
   let isEmpty = false;
@@ -154,6 +157,74 @@ function makeInputsEmpty(inputs) {
 
 const db = new DB();
 
+class User {
+  constructor() {
+    this.auth = firebase.auth();
+  }
+
+  createUserWithEmailAndPassword(email, password) {
+    this.auth
+      .createUserWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        // Signed in
+        this.credential = userCredential.user;
+        // ...
+      })
+      .catch((error) => {
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // ..
+      });
+  }
+  signInWithGoogle() {
+    var provider = new firebase.auth.GoogleAuthProvider();
+    this.auth
+      .signInWithPopup(provider)
+      .then((result) => {
+        /** @type {firebase.auth.OAuthCredential} */
+        var credential = result.credential;
+
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        var token = credential.accessToken;
+        // The signed-in user info.
+        this.user = result.user;
+        // ...
+        const currUserP = document.querySelector("p.currUserName");
+        currUserP.textContent = this.user.displayName;
+        console.log(this);
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // The email of the user's account used.
+        var email = error.email;
+        // The firebase.auth.AuthCredential type that was used.
+        var credential = error.credential;
+        console.log(errorCode, errorMessage);
+        // ...
+      });
+  }
+  signInWithEmailAndPassword(email, password) {
+    this.auth
+      .signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        this.user = userCredential.user;
+        console.log(this.user);
+      })
+      .catch((error) => {
+        var errorCode = error.code;
+        var errorMessage = error.message;
+      });
+  }
+
+  signOut() {
+    this.auth.signOut().then(() => {
+      console.log("Sign Out");
+    });
+  }
+}
+
 // Event handlers
 const addBookHandler = (ev) => {
   ev.preventDefault();
@@ -191,62 +262,35 @@ const deleteToggleHandler = (ev) => {
 
 function signUpBtnHandler(ev) {
   ev.preventDefault();
-  firebase
-    .auth()
-    .createUserWithEmailAndPassword(user.email, user.password)
-    .then((userCredential) => {
-      // Signed in
-      user.push(userCredential.user);
-      // ...
-    })
-    .catch((error) => {
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      // ..
-    });
+  const user = new User();
+
+  const email = signUpForm.querySelector('input[name="email"]').value;
+  const password = signUpForm.querySelector('input[name="password"]').value;
+  user.createUserWithEmailAndPassword(email, password);
 }
 
 function signUpWithGoogleHandler(ev) {
   ev.preventDefault();
-  var provider = new firebase.auth.GoogleAuthProvider();
-  firebase
-    .auth()
-    .signInWithPopup(provider)
-    .then((result) => {
-      /** @type {firebase.auth.OAuthCredential} */
-      var credential = result.credential;
-
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      var token = credential.accessToken;
-      // The signed-in user info.
-      user = result.user;
-      // ...
-      const currUserP = document.querySelector("p.currUserName");
-      currUserP.textContent = user.displayName;
-      console.log(user);
-    })
-    .catch((error) => {
-      // Handle Errors here.
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      // The email of the user's account used.
-      var email = error.email;
-      // The firebase.auth.AuthCredential type that was used.
-      var credential = error.credential;
-      console.log(errorCode, errorMessage);
-      // ...
-    });
+  const user = new User();
+  user.signInWithGoogle();
 }
 
+function signInBtnHandler(ev) {
+  ev.preventDefault();
+  const user = new User();
+  const email = signInForm.querySelector('input[name="email"]').value;
+  const password = signInForm.querySelector('input[name="password"]').value;
+  user.signInWithEmailAndPassword(email, password);
+  signInForm.classList.add("hidden");
+}
+
+function signOutBtnHandler() {}
 cardsList.addEventListener("click", deleteToggleHandler);
 addBookBtn.addEventListener("click", addBookHandler);
 
-signUpInputs.forEach((input) => {
-  input.addEventListener("change", (ev) => {
-    user[ev.target.name] = ev.target.value;
-  });
-});
 signUpBtn.addEventListener("click", signUpBtnHandler);
 signUpWithGoogleBtn.addEventListener("click", signUpWithGoogleHandler);
 
-dbStorage.getBooks();
+signInBtn.addEventListener("click", signInBtnHandler);
+signOutBtn.addEventListener("click", signOutBtnHandler);
+db.getBooks();

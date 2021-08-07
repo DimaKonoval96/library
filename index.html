@@ -12,6 +12,10 @@
     />
   </head>
   <body>
+    <nav>
+      <a href="#">Sign In</a>
+      <a href="#">Sign Up</a>
+    </nav>
     <div class="cardsList"></div>
     <form id="addBookForm">
       <label>
@@ -50,18 +54,35 @@
         <p>Password:</p>
         <input type="password" name="password" />
       </label>
-      <label>
-        <p>Confirm password:</p>
-        <input type="password" name="passwordConfirm" />
-      </label>
       <div>
         <button type="submit">Sign Up</button>
         <button name="signUpGoogleBtn">Sign up with Google</button>
       </div>
     </form>
 
+    <form id="signInForm">
+      <h3>Sign In</h3>
+      <label>
+        <p>Name:</p>
+        <input type="text" name="name" />
+      </label>
+      <label>
+        <p>Email:</p>
+        <input type="email" name="email" />
+      </label>
+      <label>
+        <p>Password:</p>
+        <input type="password" name="password" />
+      </label>
+      <div>
+        <button type="submit">Sign In</button>
+        <button name="signUpGoogleBtn">Sign up with Google</button>
+      </div>
+    </form>
+
     <div id="currUser">
       <p class="currUserName"></p>
+      <button id="signOut">Sign Out</button>
     </div>
     <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-firestore.js"></script>
