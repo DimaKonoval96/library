@@ -3,10 +3,67 @@
   margin: 0;
   padding: 0;
 }
+body {
+  /* background: #eaebeb; */
+}
+
+.btn {
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+  padding: 10px;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+}
+
+.btn-dark {
+  background: #333;
+  color: #fff;
+  cursor: pointer;
+}
+
+.btn-dark:hover {
+  background: #444;
+}
+
+.cardsList {
+  margin-top: 100px;
+  display: grid;
+  grid-template-columns: repeat(4, 250px);
+  grid-template-rows: auto;
+  grid-gap: 20px;
+  align-items: center;
+  justify-content: center;
+}
 
 .card {
   display: inline-block;
   background: #f4f4f4;
+  position: relative;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.438);
+}
+
+.card:hover {
+  transform: scale(1.1);
+  transition: transform 0.5s ease-out;
+}
+
+.card:hover .delete {
+  visibility: visible;
+}
+
+#cardTitle {
+  font-size: 20px;
+  font-weight: bold;
+}
+#cardAuthor {
+  font-style: italic;
+}
+.card > p {
+  margin-top: 10px;
 }
 /* The switch - the box around the slider */
 .switch {
@@ -71,21 +128,88 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
-.card {
-  position: relative;
-}
-
 .delete {
   position: absolute;
   right: 0;
+  top: 0;
+  color: #ff11009f;
+  cursor: pointer;
+  transform: translate(5px, -5px);
+  visibility: hidden;
 }
 
 #currUser {
   position: relative;
-  border: 1px solid red;
+  /* display: inline-block; */
+}
+
+.modal {
+  position: fixed;
+  display: flex;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgb(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+}
+
+form#addBookForm {
+  position: relative;
+  background: white;
   display: inline-block;
+  padding: 20px 30px;
+  width: 500px;
+  font-size: 18px;
+  border-radius: 10px;
+}
+form#addBookForm label:not(.switch) {
+  display: block;
+  margin-top: 10px;
+}
+div.switchContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+form#addBookForm input:not(input[type="checkbox"]) {
+  padding: 10px 0;
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #444;
+  outline: none;
+  font-size: 18px;
+}
+
+form#addBookForm input:not(input[type="checkbox"])::placeholder {
+  font-size: 18px;
+}
+
+form div.btnContainer {
+  display: block;
+  margin-top: 20px;
+}
+
+form .addBookBtn {
+  width: 100%;
+  color: #fff;
+  background: #333;
 }
 
 .hidden {
   display: none;
+}
+
+.btnContainer {
+  margin-top: 50px;
+  display: flex;
+  justify-content: center;
 }

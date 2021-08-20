@@ -6,41 +6,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Library</title>
     <link rel="stylesheet" href="css/styles.css" type="text/css" />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css"
-      rel="stylesheet"
-    />
+    <script
+      src="https://kit.fontawesome.com/6f41c10b22.js"
+      crossorigin="anonymous"
+    ></script>
   </head>
   <body>
-    <nav>
-      <a href="#">Sign In</a>
-      <a href="#">Sign Up</a>
-    </nav>
     <div class="cardsList"></div>
-    <form id="addBookForm">
-      <label>
-        <p>Title:</p>
-        <input type="text" name="title" id="title" required />
-      </label>
-      <label>
-        <p>Author:</p>
-        <input type="text" name="author" title="author" id="author" />
-      </label>
-      <label>
-        <p>Number of Pages:</p>
-        <input type="number" name="pages" id="pages" />
-      </label>
-      <span>Have already read?</span>
-      <label class="switch">
-        <input type="checkbox" name="isRead" id="isRead" />
-        <span class="slider round"></span>
-      </label>
+    <button id="loginBtn" class="btn btn-dark">Login</button>
+    <div id="currUser" class="hidden">
+      <span id="userName"></span>
+      <button id="signOutBtn" class="btn btn-dark">Sign Out</button>
+    </div>
+    <div id="loginModal" class="modal hidden">
       <div>
-        <button type="button" class="addBookBtn">Add Book</button>
+        <button id="loginGoogleBtn" class="btn">Continue with Google</button>
       </div>
-    </form>
-
-    <form id="signUpForm">
+    </div>
+    <div id="bookModal" class="modal hidden">
+      <form id="addBookForm">
+        <label>
+          <input
+            type="text"
+            name="title"
+            id="title"
+            placeholder="Title"
+            required
+          />
+        </label>
+        <label>
+          <input
+            type="text"
+            name="author"
+            title="author"
+            id="author"
+            placeholder="Author"
+            required
+          />
+        </label>
+        <label>
+          <input
+            type="number"
+            name="pages"
+            id="pages"
+            placeholder="Number of pages"
+            required
+          />
+        </label>
+        <div class="switchContainer">
+          <p>Have already read?</p>
+          <label class="switch">
+            <input type="checkbox" name="isRead" id="isRead" />
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <div class="btnContainer">
+          <button type="button" class="addBookBtn btn btn-dark">
+            Add A Book
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="btnContainer">
+      <button id="newBookBtn" class="btn btn-dark">New Book</button>
+    </div>
+    <!-- <form id="signUpForm">
       <h3>Sign Up</h3>
       <label>
         <p>Name:</p>
@@ -83,7 +113,7 @@
     <div id="currUser">
       <p class="currUserName"></p>
       <button id="signOut">Sign Out</button>
-    </div>
+    </div> -->
     <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-analytics.js"></script>

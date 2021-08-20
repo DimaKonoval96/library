@@ -14,25 +14,26 @@ firebase.analytics();
 let library = [];
 
 // Book Form and Cards
+const addBookForm = document.querySelector("form#addBookForm");
 const addBookBtn = document.querySelector(".addBookBtn");
 const cardsList = document.querySelector(".cardsList");
 const inputs = document.querySelectorAll("form#addBookForm input");
+const bookModal = document.querySelector("#bookModal");
+const loginModal = document.querySelector("#loginModal");
 
 // Sign Up
-const signUpForm = document.querySelector("#signUpForm");
-const signUpInputs = signUpForm.querySelectorAll("input");
-const emailInput = signUpForm.querySelector('input[name="email"]');
-const passwdInput = signUpForm.querySelector('input[name="password"');
-const passwdComfirmInput = signUpForm.querySelector(
-  'input[name="passwordConfirm"'
-);
-const signUpBtn = signUpForm.querySelector('button[type="submit"]');
-const signUpWithGoogleBtn = signUpForm.querySelector(
-  'button[name="signUpGoogleBtn"]'
-);
-const signInForm = document.querySelector("#signInForm");
-const signInBtn = signInForm.querySelector('button[type="submit"]');
-const signOutBtn = document.querySelector("#signOut");
+// const signUpForm = document.querySelector("#signUpForm");
+// const signUpInputs = signUpForm.querySelectorAll("input");
+// const emailInput = signUpForm.querySelector('input[name="email"]');
+// const passwdInput = signUpForm.querySelector('input[name="password"');
+// const passwdComfirmInput = signUpForm.querySelector(
+//   'input[name="passwordConfirm"'
+// );
+// const signUpBtn = signUpForm.querySelector('button[type="submit"]');
+const loginGoogleBtn = document.querySelector("button#loginGoogleBtn");
+// const signInForm = document.querySelector("#signInForm");
+// const signInBtn = signInForm.querySelector('button[type="submit"]');
+// const signOutBtn = document.querySelector("#signOut");
 
 // Validator
 const isValid = () => {
@@ -65,15 +66,18 @@ class BookUI {
     const checked = isRead ? "checked" : "";
 
     card.innerHTML = `
-      <p>${title}</p>
-      <p>${author}</p>
-      <p>${pages}</p>
-      <p>Have already read?</p>
-      <label class='switch'>
-        <input type="checkbox" ${checked} name="isRead" class='isRead'>
-        <span class='slider round'></span>
-      </label>
-      <i class="fas fa-minus-circle delete"></i>`;
+      <p id='cardTitle'>${title}</p>
+      <p id='cardAuthor'>${author}</p>
+      <p id='cardPages'>${pages} pages</p>
+      <div class='switchContainer'>
+        <span>Have already read?</span>
+        <label class='switch'>
+        
+          <input type="checkbox" ${checked} name="isRead" class='isRead'>
+          <span class='slider round'></span>
+        </label>
+      </div>
+      <i class="fas fa-times-circle delete"></i>`;
     return card;
   }
 
@@ -176,7 +180,7 @@ class User {
         // ..
       });
   }
-  signInWithGoogle() {
+  loginWithGoogle() {
     var provider = new firebase.auth.GoogleAuthProvider();
     this.auth
       .signInWithPopup(provider)
@@ -189,9 +193,8 @@ class User {
         // The signed-in user info.
         this.user = result.user;
         // ...
-        const currUserP = document.querySelector("p.currUserName");
-        currUserP.textContent = this.user.displayName;
-        console.log(this);
+        // const currUserP = document.querySelector("p.currUserName");
+        // currUserP.textContent = this.user.displayName;
       })
       .catch((error) => {
         // Handle Errors here.
@@ -219,9 +222,7 @@ class User {
   }
 
   signOut() {
-    this.auth.signOut().then(() => {
-      console.log("Sign Out");
-    });
+    this.auth.signOut();
   }
 }
 
@@ -237,6 +238,7 @@ const addBookHandler = (ev) => {
   const book = new Book(title, author, pages, isRead);
 
   db.addBook(book);
+  bookModal.classList.add("hidden");
 };
 
 function deleteHandler(ev) {
@@ -247,7 +249,7 @@ function deleteHandler(ev) {
 }
 
 function toggleHandler(ev) {
-  const id = ev.target.parentNode.parentNode.id;
+  const id = ev.target.parentNode.parentNode.parentNode.id;
   const isRead = ev.target.checked;
   db.updateIsRead(id, isRead);
 }
@@ -269,10 +271,11 @@ function signUpBtnHandler(ev) {
   user.createUserWithEmailAndPassword(email, password);
 }
 
-function signUpWithGoogleHandler(ev) {
+function loginWithGoogleHandler(ev) {
   ev.preventDefault();
   const user = new User();
-  user.signInWithGoogle();
+  user.loginWithGoogle();
+  loginModal.classList.add("hidden");
 }
 
 function signInBtnHandler(ev) {
@@ -284,13 +287,51 @@ function signInBtnHandler(ev) {
   signInForm.classList.add("hidden");
 }
 
-function signOutBtnHandler() {}
+function signOutBtnHandler(ev) {
+  const user = new User();
+  user.signOut();
+}
 cardsList.addEventListener("click", deleteToggleHandler);
 addBookBtn.addEventListener("click", addBookHandler);
 
-signUpBtn.addEventListener("click", signUpBtnHandler);
-signUpWithGoogleBtn.addEventListener("click", signUpWithGoogleHandler);
+// signUpBtn.addEventListener("click", signUpBtnHandler);
+loginGoogleBtn.addEventListener("click", loginWithGoogleHandler);
 
-signInBtn.addEventListener("click", signInBtnHandler);
-signOutBtn.addEventListener("click", signOutBtnHandler);
+// signInBtn.addEventListener("click", signInBtnHandler);
+// signOutBtn.addEventListener("click", signOutBtnHandler);
 db.getBooks();
+
+firebase.auth().onAuthStateChanged((user) => {
+  const currUserDiv = document.querySelector("#currUser");
+  if (user) {
+    // User is signed in, see docs for a list of available properties
+    // https://firebase.google.com/docs/reference/js/firebase.User
+    var uid = user.uid;
+    currUserDiv.classList.remove("hidden");
+    document.querySelector("#loginBtn").classList.add("hidden");
+    currUserDiv.querySelector("#userName").textContent = user.displayName;
+  } else {
+    currUserDiv.classList.add("hidden");
+    document.querySelector("#loginBtn").classList.remove("hidden");
+  }
+});
+
+document.querySelector("#newBookBtn").addEventListener("click", (ev) => {
+  bookModal.classList.remove("hidden");
+});
+
+document.querySelector("#loginBtn").addEventListener("click", (ev) => {
+  loginModal.classList.remove("hidden");
+});
+
+document
+  .querySelector("#signOutBtn")
+  .addEventListener("click", signOutBtnHandler);
+
+window.addEventListener("click", (ev) => {
+  if (ev.target.className.includes("modal")) {
+    ev.target.classList.add("hidden");
+  }
+});
+const user = new User();
+console.log(user.auth);
