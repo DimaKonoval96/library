@@ -20,7 +20,7 @@ const cardsList = document.querySelector(".cardsList");
 const inputs = document.querySelectorAll("form#addBookForm input");
 const bookModal = document.querySelector("#bookModal");
 const loginModal = document.querySelector("#loginModal");
-
+let db;
 // Sign Up
 // const signUpForm = document.querySelector("#signUpForm");
 // const signUpInputs = signUpForm.querySelectorAll("input");
@@ -34,6 +34,22 @@ const loginGoogleBtn = document.querySelector("button#loginGoogleBtn");
 // const signInForm = document.querySelector("#signInForm");
 // const signInBtn = signInForm.querySelector('button[type="submit"]');
 // const signOutBtn = document.querySelector("#signOut");
+
+firebase.auth().onAuthStateChanged((user) => {
+  const currUserDiv = document.querySelector("#currUser");
+  if (user) {
+    db = new DB(user.uid);
+    // User is signed in, see docs for a list of available properties
+    // https://firebase.google.com/docs/reference/js/firebase.User
+    db.getBooks();
+    currUserDiv.classList.remove("hidden");
+    document.querySelector("#loginBtn").classList.add("hidden");
+    currUserDiv.querySelector("#userName").textContent = user.displayName;
+  } else {
+    currUserDiv.classList.add("hidden");
+    document.querySelector("#loginBtn").classList.remove("hidden");
+  }
+});
 
 // Validator
 const isValid = () => {
@@ -100,67 +116,6 @@ class BookUI {
   }
 }
 
-class DB {
-  constructor() {
-    this.db = firebase.firestore();
-  }
-
-  addBook(book) {
-    this.db
-      .collection("books")
-      .add(Object.assign({}, book))
-      .then((doc) => {
-        book.id = doc.id;
-        library.push(book);
-        BookUI.addCard(book);
-      })
-      .catch((error) => {
-        console.error("Error adding document: ", error);
-      });
-  }
-
-  removeBook(id) {
-    this.db.collection("books").doc(id).delete();
-  }
-
-  updateIsRead(id, isRead) {
-    this.db.collection("books").doc(id).set(
-      {
-        isRead,
-      },
-      { merge: true }
-    );
-  }
-
-  getBooks() {
-    console.log(this.db);
-    this.db
-      .collection("books")
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          const id = doc.id;
-          library.push({ id, ...doc.data() });
-        });
-      })
-      .then(() => {
-        BookUI.displayCards();
-      });
-  }
-}
-
-function makeInputsEmpty(inputs) {
-  inputs.forEach((input) => {
-    if (input.type != "checkbox") {
-      input.value = "";
-    } else {
-      input.checked = false;
-    }
-  });
-}
-
-const db = new DB();
-
 class User {
   constructor() {
     this.auth = firebase.auth();
@@ -192,6 +147,8 @@ class User {
         var token = credential.accessToken;
         // The signed-in user info.
         this.user = result.user;
+        const db = new DB();
+        db.db.collection("users").doc(this.user.uid).set({});
         // ...
         // const currUserP = document.querySelector("p.currUserName");
         // currUserP.textContent = this.user.displayName;
@@ -224,6 +181,66 @@ class User {
   signOut() {
     this.auth.signOut();
   }
+}
+class DB {
+  constructor(uid) {
+    this.docRef = firebase.firestore().collection(`users`).doc(`${uid}`);
+  }
+
+  // docRef = this.db.doc(`users/${this.uid}/books`);
+
+  addBook(book) {
+    this.docRef
+      .collection("books")
+      .add(Object.assign({}, book))
+      .then((doc) => {
+        book.id = doc.id;
+        library.push(book);
+        BookUI.addCard(book);
+      })
+      .catch((error) => {
+        console.error("Error adding document: ", error);
+      });
+  }
+
+  removeBook(id) {
+    this.docRef.collection("books").doc(id).delete();
+  }
+
+  updateIsRead(id, isRead) {
+    this.docRef.collection("books").doc(id).set(
+      {
+        isRead,
+      },
+      { merge: true }
+    );
+  }
+
+  getBooks() {
+    console.log(this.docRef);
+    this.docRef
+      .collection("books")
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          const id = doc.id;
+          library.push({ id, ...doc.data() });
+        });
+      })
+      .then(() => {
+        BookUI.displayCards();
+      });
+  }
+}
+
+function makeInputsEmpty(inputs) {
+  inputs.forEach((input) => {
+    if (input.type != "checkbox") {
+      input.value = "";
+    } else {
+      input.checked = false;
+    }
+  });
 }
 
 // Event handlers
@@ -299,22 +316,6 @@ loginGoogleBtn.addEventListener("click", loginWithGoogleHandler);
 
 // signInBtn.addEventListener("click", signInBtnHandler);
 // signOutBtn.addEventListener("click", signOutBtnHandler);
-db.getBooks();
-
-firebase.auth().onAuthStateChanged((user) => {
-  const currUserDiv = document.querySelector("#currUser");
-  if (user) {
-    // User is signed in, see docs for a list of available properties
-    // https://firebase.google.com/docs/reference/js/firebase.User
-    var uid = user.uid;
-    currUserDiv.classList.remove("hidden");
-    document.querySelector("#loginBtn").classList.add("hidden");
-    currUserDiv.querySelector("#userName").textContent = user.displayName;
-  } else {
-    currUserDiv.classList.add("hidden");
-    document.querySelector("#loginBtn").classList.remove("hidden");
-  }
-});
 
 document.querySelector("#newBookBtn").addEventListener("click", (ev) => {
   bookModal.classList.remove("hidden");
@@ -333,5 +334,3 @@ window.addEventListener("click", (ev) => {
     ev.target.classList.add("hidden");
   }
 });
-const user = new User();
-console.log(user.auth);
