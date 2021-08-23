@@ -11,8 +11,6 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 firebase.analytics();
 
-let library = [];
-
 // Book Form and Cards
 const addBookForm = document.querySelector("form#addBookForm");
 const addBookBtn = document.querySelector(".addBookBtn");
@@ -46,10 +44,27 @@ firebase.auth().onAuthStateChanged((user) => {
     document.querySelector("#loginBtn").classList.add("hidden");
     currUserDiv.querySelector("#userName").textContent = user.displayName;
   } else {
+    db = new LS();
+    db.getBooks();
     currUserDiv.classList.add("hidden");
     document.querySelector("#loginBtn").classList.remove("hidden");
   }
 });
+
+function createUUID() {
+  let dt = new Date().getTime();
+
+  const uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+    /[xy]/g,
+    function (c) {
+      const r = (dt + Math.random() * 16) % 16 | 0;
+      dt = Math.floor(dt / 16);
+      return (c == "x" ? r : (r & 0x3) | 0x8).toString(16);
+    }
+  );
+
+  return uuid;
+}
 
 // Validator
 const isValid = () => {
@@ -69,6 +84,7 @@ class Book {
     this.author = author;
     this.pages = pages;
     this.isRead = isRead;
+    this.id = createUUID();
   }
 }
 
@@ -101,17 +117,22 @@ class BookUI {
     ev.currentTarget.removeChild(ev.target.parentNode);
   }
 
+  static clearCardsList() {
+    cardsList.innerHTML = "";
+  }
+
   static addCard(book) {
     cardsList.append(this.createCard(book));
     makeInputsEmpty(inputs);
   }
 
-  static displayCards() {
+  static displayCards(library) {
     const fragment = document.createDocumentFragment();
 
-    const cards = library.forEach((book) => {
-      fragment.appendChild(this.createCard(book));
+    library.forEach((book) => {
+      fragment.append(this.createCard(book));
     });
+    cardsList.innerHTML = "";
     cardsList.append(fragment);
   }
 }
@@ -147,8 +168,7 @@ class User {
         var token = credential.accessToken;
         // The signed-in user info.
         this.user = result.user;
-        const db = new DB();
-        db.db.collection("users").doc(this.user.uid).set({});
+
         // ...
         // const currUserP = document.querySelector("p.currUserName");
         // currUserP.textContent = this.user.displayName;
@@ -182,7 +202,37 @@ class User {
     this.auth.signOut();
   }
 }
+
+class LS {
+  library = [];
+  addBook(book) {
+    window.localStorage.setItem(book.id, JSON.stringify(book));
+    this.library.push(book);
+    BookUI.addCard(book);
+  }
+
+  removeBook(id) {
+    window.localStorage.removeItem(id);
+  }
+
+  updateIsRead(id, isRead) {
+    const book = JSON.parse(localStorage.getItem(id));
+    book.isRead = !isRead;
+    localStorage.setItem(id, JSON.stringify(book));
+  }
+  getBooks() {
+    const keys = Object.keys(localStorage);
+    let i = keys.length;
+
+    while (i--) {
+      this.library.push(JSON.parse(localStorage.getItem(keys[i])));
+    }
+    // debugger;
+    BookUI.displayCards(this.library);
+  }
+}
 class DB {
+  library = [];
   constructor(uid) {
     this.docRef = firebase.firestore().collection(`users`).doc(`${uid}`);
   }
@@ -192,10 +242,10 @@ class DB {
   addBook(book) {
     this.docRef
       .collection("books")
-      .add(Object.assign({}, book))
+      .doc(book.id)
+      .set(Object.assign({}, book))
       .then((doc) => {
-        book.id = doc.id;
-        library.push(book);
+        this.library.push(book);
         BookUI.addCard(book);
       })
       .catch((error) => {
@@ -217,18 +267,17 @@ class DB {
   }
 
   getBooks() {
-    console.log(this.docRef);
     this.docRef
       .collection("books")
       .get()
       .then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
           const id = doc.id;
-          library.push({ id, ...doc.data() });
+          this.library.push({ id, ...doc.data() });
         });
       })
       .then(() => {
-        BookUI.displayCards();
+        BookUI.displayCards(this.library);
       });
   }
 }
