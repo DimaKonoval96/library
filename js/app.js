@@ -19,26 +19,13 @@ const inputs = document.querySelectorAll("form#addBookForm input");
 const bookModal = document.querySelector("#bookModal");
 const loginModal = document.querySelector("#loginModal");
 let db;
-// Sign Up
-// const signUpForm = document.querySelector("#signUpForm");
-// const signUpInputs = signUpForm.querySelectorAll("input");
-// const emailInput = signUpForm.querySelector('input[name="email"]');
-// const passwdInput = signUpForm.querySelector('input[name="password"');
-// const passwdComfirmInput = signUpForm.querySelector(
-//   'input[name="passwordConfirm"'
-// );
-// const signUpBtn = signUpForm.querySelector('button[type="submit"]');
+
 const loginGoogleBtn = document.querySelector("button#loginGoogleBtn");
-// const signInForm = document.querySelector("#signInForm");
-// const signInBtn = signInForm.querySelector('button[type="submit"]');
-// const signOutBtn = document.querySelector("#signOut");
 
 firebase.auth().onAuthStateChanged((user) => {
   const currUserDiv = document.querySelector("#currUser");
   if (user) {
-    db = new DB(user.uid);
-    // User is signed in, see docs for a list of available properties
-    // https://firebase.google.com/docs/reference/js/firebase.User
+    db = new Cloud(user.uid);
     db.getBooks();
     currUserDiv.classList.remove("hidden");
     document.querySelector("#loginBtn").classList.add("hidden");
@@ -142,20 +129,6 @@ class User {
     this.auth = firebase.auth();
   }
 
-  createUserWithEmailAndPassword(email, password) {
-    this.auth
-      .createUserWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        // Signed in
-        this.credential = userCredential.user;
-        // ...
-      })
-      .catch((error) => {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        // ..
-      });
-  }
   loginWithGoogle() {
     var provider = new firebase.auth.GoogleAuthProvider();
     this.auth
@@ -163,38 +136,16 @@ class User {
       .then((result) => {
         /** @type {firebase.auth.OAuthCredential} */
         var credential = result.credential;
-
-        // This gives you a Google Access Token. You can use it to access the Google API.
         var token = credential.accessToken;
-        // The signed-in user info.
         this.user = result.user;
-
-        // ...
-        // const currUserP = document.querySelector("p.currUserName");
-        // currUserP.textContent = this.user.displayName;
       })
       .catch((error) => {
-        // Handle Errors here.
         var errorCode = error.code;
         var errorMessage = error.message;
-        // The email of the user's account used.
         var email = error.email;
-        // The firebase.auth.AuthCredential type that was used.
         var credential = error.credential;
         console.log(errorCode, errorMessage);
         // ...
-      });
-  }
-  signInWithEmailAndPassword(email, password) {
-    this.auth
-      .signInWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        this.user = userCredential.user;
-        console.log(this.user);
-      })
-      .catch((error) => {
-        var errorCode = error.code;
-        var errorMessage = error.message;
       });
   }
 
@@ -206,18 +157,19 @@ class User {
 class LS {
   library = [];
   addBook(book) {
-    window.localStorage.setItem(book.id, JSON.stringify(book));
+    localStorage.setItem(book.id, JSON.stringify(book));
     this.library.push(book);
     BookUI.addCard(book);
   }
 
   removeBook(id) {
-    window.localStorage.removeItem(id);
+    this.library = this.library.filter((book) => book.id != id);
+    localStorage.removeItem(id);
   }
 
   updateIsRead(id, isRead) {
     const book = JSON.parse(localStorage.getItem(id));
-    book.isRead = !isRead;
+    book.isRead = isRead;
     localStorage.setItem(id, JSON.stringify(book));
   }
   getBooks() {
@@ -227,17 +179,15 @@ class LS {
     while (i--) {
       this.library.push(JSON.parse(localStorage.getItem(keys[i])));
     }
-    // debugger;
+
     BookUI.displayCards(this.library);
   }
 }
-class DB {
+class Cloud {
   library = [];
   constructor(uid) {
     this.docRef = firebase.firestore().collection(`users`).doc(`${uid}`);
   }
-
-  // docRef = this.db.doc(`users/${this.uid}/books`);
 
   addBook(book) {
     this.docRef
@@ -254,6 +204,7 @@ class DB {
   }
 
   removeBook(id) {
+    this.library = this.library.filter((book) => book.id != id);
     this.docRef.collection("books").doc(id).delete();
   }
 
@@ -309,7 +260,6 @@ const addBookHandler = (ev) => {
 
 function deleteHandler(ev) {
   const id = ev.target.parentNode.id;
-  library = library.filter((book) => book.id != id);
   db.removeBook(id);
   BookUI.removeCard(ev);
 }
@@ -360,11 +310,7 @@ function signOutBtnHandler(ev) {
 cardsList.addEventListener("click", deleteToggleHandler);
 addBookBtn.addEventListener("click", addBookHandler);
 
-// signUpBtn.addEventListener("click", signUpBtnHandler);
 loginGoogleBtn.addEventListener("click", loginWithGoogleHandler);
-
-// signInBtn.addEventListener("click", signInBtnHandler);
-// signOutBtn.addEventListener("click", signOutBtnHandler);
 
 document.querySelector("#newBookBtn").addEventListener("click", (ev) => {
   bookModal.classList.remove("hidden");

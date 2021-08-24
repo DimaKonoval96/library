@@ -7,6 +7,10 @@ body {
   /* background: #eaebeb; */
 }
 
+.flex {
+  display: flex;
+}
+
 .btn {
   background: #fff;
   color: #333;
@@ -91,6 +95,7 @@ body {
   background-color: red;
   -webkit-transition: 0.4s;
   transition: 0.4s;
+  cursor: pointer;
 }
 
 .slider:before {
@@ -161,6 +166,7 @@ input:checked + .slider:before {
 }
 
 form#addBookForm {
+  margin-bottom: 200px;
   position: relative;
   background: white;
   display: inline-block;
@@ -212,4 +218,31 @@ form .addBookBtn {
   margin-top: 50px;
   display: flex;
   justify-content: center;
+}
+
+#loginBtn,
+#currUser {
+  position: absolute;
+  right: 100px;
+  top: 20px;
+}
+
+#loginBtnContainer {
+  margin-bottom: 200px;
+  background: white;
+  padding: 50px 50px 100px;
+  border-radius: 10px;
+}
+
+#loginGoogleBtn {
+  background: #ddd;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#loginGoogleBtn > span {
+  margin-left: 15px;
+}
+#userName {
+  margin-right: 20px;
 }

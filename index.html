@@ -12,17 +12,21 @@
     ></script>
   </head>
   <body>
-    <div class="cardsList"></div>
     <button id="loginBtn" class="btn btn-dark">Login</button>
     <div id="currUser" class="hidden">
       <span id="userName"></span>
       <button id="signOutBtn" class="btn btn-dark">Sign Out</button>
     </div>
     <div id="loginModal" class="modal hidden">
-      <div>
-        <button id="loginGoogleBtn" class="btn">Continue with Google</button>
+      <div id="loginBtnContainer">
+        <button id="loginGoogleBtn" class="btn flex">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
+          /><span>Continue with Google</span>
+        </button>
       </div>
     </div>
+    <div class="cardsList"></div>
     <div id="bookModal" class="modal hidden">
       <form id="addBookForm">
         <label>
@@ -70,50 +74,7 @@
     <div class="btnContainer">
       <button id="newBookBtn" class="btn btn-dark">New Book</button>
     </div>
-    <!-- <form id="signUpForm">
-      <h3>Sign Up</h3>
-      <label>
-        <p>Name:</p>
-        <input type="text" name="name" />
-      </label>
-      <label>
-        <p>Email:</p>
-        <input type="email" name="email" />
-      </label>
-      <label>
-        <p>Password:</p>
-        <input type="password" name="password" />
-      </label>
-      <div>
-        <button type="submit">Sign Up</button>
-        <button name="signUpGoogleBtn">Sign up with Google</button>
-      </div>
-    </form>
 
-    <form id="signInForm">
-      <h3>Sign In</h3>
-      <label>
-        <p>Name:</p>
-        <input type="text" name="name" />
-      </label>
-      <label>
-        <p>Email:</p>
-        <input type="email" name="email" />
-      </label>
-      <label>
-        <p>Password:</p>
-        <input type="password" name="password" />
-      </label>
-      <div>
-        <button type="submit">Sign In</button>
-        <button name="signUpGoogleBtn">Sign up with Google</button>
-      </div>
-    </form>
-
-    <div id="currUser">
-      <p class="currUserName"></p>
-      <button id="signOut">Sign Out</button>
-    </div> -->
     <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-analytics.js"></script>
