@@ -34,7 +34,6 @@ firebase.auth().onAuthStateChanged((user) => {
     db = new LS();
     db.getBooks();
     currUserDiv.classList.add("hidden");
-    document.querySelector("#loginBtn").classList.remove("hidden");
   }
 });
 
@@ -291,7 +290,6 @@ function loginWithGoogleHandler(ev) {
   ev.preventDefault();
   const user = new User();
   user.loginWithGoogle();
-  loginModal.classList.add("hidden");
 }
 
 function signInBtnHandler(ev) {
@@ -310,15 +308,13 @@ function signOutBtnHandler(ev) {
 cardsList.addEventListener("click", deleteToggleHandler);
 addBookBtn.addEventListener("click", addBookHandler);
 
-loginGoogleBtn.addEventListener("click", loginWithGoogleHandler);
-
 document.querySelector("#newBookBtn").addEventListener("click", (ev) => {
   bookModal.classList.remove("hidden");
 });
 
-document.querySelector("#loginBtn").addEventListener("click", (ev) => {
-  loginModal.classList.remove("hidden");
-});
+document
+  .querySelector("#loginBtn")
+  .addEventListener("click", loginWithGoogleHandler);
 
 document
   .querySelector("#signOutBtn")

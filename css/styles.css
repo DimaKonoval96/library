@@ -227,22 +227,6 @@ form .addBookBtn {
   top: 20px;
 }
 
-#loginBtnContainer {
-  margin-bottom: 200px;
-  background: white;
-  padding: 50px 50px 100px;
-  border-radius: 10px;
-}
-
-#loginGoogleBtn {
-  background: #ddd;
-  align-items: center;
-  justify-content: space-between;
-}
-
-#loginGoogleBtn > span {
-  margin-left: 15px;
-}
 #userName {
   margin-right: 20px;
 }
