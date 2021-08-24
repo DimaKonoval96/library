@@ -1,3 +1,2 @@
 # library
-A small application to store books
-Created using JS, HTML and CSS
+A small library created with JS, HTML, CSS and Firebase
