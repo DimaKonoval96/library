@@ -7,6 +7,11 @@ body {
   /* background: #eaebeb; */
 }
 
+i {
+  width: 16px;
+  height: 16px;
+}
+
 .flex {
   display: flex;
 }
@@ -54,8 +59,9 @@ body {
   transform: scale(1.1);
   transition: transform 0.5s ease-out;
 }
+/* .card */
 
-.card:hover .delete {
+.card:hover .delete, .card:hover .edit {
   visibility: visible;
 }
 
@@ -142,6 +148,16 @@ input:checked + .slider:before {
   transform: translate(5px, -5px);
   visibility: hidden;
 }
+
+.edit {
+  position: absolute;
+  right: 20px;
+  top: 0;
+  color: black;
+  cursor: pointer;
+  transform: translate(5px, -5px);
+  visibility: hidden;
+} 
 
 #currUser {
   position: relative;

@@ -95,6 +95,7 @@ class BookUI {
           <span class='slider round'></span>
         </label>
       </div>
+      <i class="fa-solid fa-pen-to-square edit"></i>
       <i class="fas fa-times-circle delete"></i>`;
     return card;
   }
