@@ -165,8 +165,8 @@ class LS {
     BookUI.addCard(book);
   }
 
-  editBook(id) {
-    this;
+  editBook(id, bookData) {
+    localStorage.setItem(id, JSON.stringify(bookData));
   }
 
   removeBook(id) {
@@ -182,7 +182,7 @@ class LS {
   getBooks() {
     const keys = Object.keys(localStorage);
     let i = keys.length;
-
+    this.library = [];
     while (i--) {
       this.library.push(JSON.parse(localStorage.getItem(keys[i])));
     }
@@ -241,7 +241,6 @@ class Cloud {
         this.library = [];
         querySnapshot.forEach((doc) => {
           const id = doc.id;
-          console.log(doc.data());
           this.library.push({ id, ...doc.data() });
         });
       })
