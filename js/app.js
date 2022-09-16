@@ -299,7 +299,6 @@ const deleteToggleHandler = (ev) => {
     const editBookModal = document.querySelector("#editBookModal");
     editBookModal.classList.remove("hidden");
     const { title, author, pages, isRead } = bookData;
-    console.log(isRead);
     document.querySelector("input#editTitle").value = title;
     document.querySelector("input#editAuthor").value = author;
     document.querySelector("input#editPages").value = pages;
@@ -308,28 +307,10 @@ const deleteToggleHandler = (ev) => {
   }
 };
 
-function signUpBtnHandler(ev) {
-  ev.preventDefault();
-  const user = new User();
-
-  const email = signUpForm.querySelector('input[name="email"]').value;
-  const password = signUpForm.querySelector('input[name="password"]').value;
-  user.createUserWithEmailAndPassword(email, password);
-}
-
 function loginWithGoogleHandler(ev) {
   ev.preventDefault();
   const user = new User();
   user.loginWithGoogle();
-}
-
-function signInBtnHandler(ev) {
-  ev.preventDefault();
-  const user = new User();
-  const email = signInForm.querySelector('input[name="email"]').value;
-  const password = signInForm.querySelector('input[name="password"]').value;
-  user.signInWithEmailAndPassword(email, password);
-  signInForm.classList.add("hidden");
 }
 
 function signOutBtnHandler(ev) {
