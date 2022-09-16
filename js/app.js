@@ -104,6 +104,8 @@ class BookUI {
     ev.currentTarget.removeChild(ev.target.parentNode);
   }
 
+  static editCard(book) {}
+
   static clearCardsList() {
     cardsList.innerHTML = "";
   }
@@ -154,12 +156,17 @@ class User {
   }
 }
 
+// Local Storage
 class LS {
   library = [];
   addBook(book) {
     localStorage.setItem(book.id, JSON.stringify(book));
     this.library.push(book);
     BookUI.addCard(book);
+  }
+
+  editBook(id) {
+    this;
   }
 
   removeBook(id) {
@@ -183,6 +190,8 @@ class LS {
     BookUI.displayCards(this.library);
   }
 }
+
+//Firebase
 class Cloud {
   library = [];
   constructor(uid) {
@@ -217,13 +226,22 @@ class Cloud {
     );
   }
 
+  editBook(id, bookData) {
+    this.docRef
+      .collection("books")
+      .doc(id)
+      .set(Object.assign({}, bookData), { merge: true });
+  }
+
   getBooks() {
     this.docRef
       .collection("books")
       .get()
       .then((querySnapshot) => {
+        this.library = [];
         querySnapshot.forEach((doc) => {
           const id = doc.id;
+          console.log(doc.data());
           this.library.push({ id, ...doc.data() });
         });
       })
@@ -260,6 +278,7 @@ const addBookHandler = (ev) => {
 
 function deleteHandler(ev) {
   const id = ev.target.parentNode.id;
+
   db.removeBook(id);
   BookUI.removeCard(ev);
 }
@@ -275,6 +294,18 @@ const deleteToggleHandler = (ev) => {
     deleteHandler(ev);
   } else if (ev.target.className.includes("isRead")) {
     toggleHandler(ev);
+  } else if (ev.target.className.includes("edit")) {
+    const id = ev.target.parentNode.id;
+    const bookData = db.library.filter((book) => book.id == id)[0];
+    const editBookModal = document.querySelector("#editBookModal");
+    editBookModal.classList.remove("hidden");
+    const { title, author, pages, isRead } = bookData;
+    console.log(isRead);
+    document.querySelector("input#editTitle").value = title;
+    document.querySelector("input#editAuthor").value = author;
+    document.querySelector("input#editPages").value = pages;
+    document.querySelector("input#editIsRead").checked = isRead;
+    document.querySelector("#editBookForm").setAttribute("data-id", id);
   }
 };
 
@@ -321,6 +352,18 @@ document
   .querySelector("#signOutBtn")
   .addEventListener("click", signOutBtnHandler);
 
+document.querySelector(".saveEditBtn").addEventListener("click", (ev) => {
+  const book = {};
+  book.title = document.querySelector("input#editTitle").value;
+  book.author = document.querySelector("input#editAuthor").value;
+  book.pages = document.querySelector("input#editPages").value;
+  book.isRead = document.querySelector("input#editIsRead").checked;
+  id = document.querySelector("#editBookForm").dataset.id;
+  db.editBook(id, book);
+  const editBookModal = document.querySelector("#editBookModal");
+  editBookModal.classList.add("hidden");
+  db.getBooks();
+});
 window.addEventListener("click", (ev) => {
   if (ev.target.className.includes("modal")) {
     ev.target.classList.add("hidden");

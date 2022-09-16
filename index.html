@@ -18,8 +18,10 @@
       <button id="signOutBtn" class="btn btn-dark">Sign Out</button>
     </div>
     <div class="cardsList"></div>
+
+    <!-- Add New Card Form -->
     <div id="bookModal" class="modal hidden">
-      <form id="addBookForm">
+      <form id="addBookForm" class="bookForm">
         <label>
           <input
             type="text"
@@ -58,6 +60,52 @@
         <div class="btnContainer">
           <button type="button" class="addBookBtn btn btn-dark">
             Add A Book
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Edit Card Form -->
+    <div id="editBookModal" class="modal hidden">
+      <form id="editBookForm" class="bookForm">
+        <label>
+          <input
+            type="text"
+            name="title"
+            id="editTitle"
+            placeholder="Title"
+            required
+          />
+        </label>
+        <label>
+          <input
+            type="text"
+            name="author"
+            title="author"
+            id="editAuthor"
+            placeholder="Author"
+            required
+          />
+        </label>
+        <label>
+          <input
+            type="number"
+            name="pages"
+            id="editPages"
+            placeholder="Number of pages"
+            required
+          />
+        </label>
+        <div class="switchContainer">
+          <p>Have already read?</p>
+          <label class="switch">
+            <input type="checkbox" name="isRead" id="editIsRead" />
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <div class="btnContainer">
+          <button type="button" class="saveEditBtn btn btn-dark">
+            Save Edit
           </button>
         </div>
       </form>

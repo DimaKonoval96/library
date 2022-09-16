@@ -181,7 +181,7 @@ input:checked + .slider:before {
   align-items: center;
 }
 
-form#addBookForm {
+form.bookForm {
   margin-bottom: 200px;
   position: relative;
   background: white;
@@ -191,7 +191,7 @@ form#addBookForm {
   font-size: 18px;
   border-radius: 10px;
 }
-form#addBookForm label:not(.switch) {
+form.bookForm label:not(.switch) {
   display: block;
   margin-top: 10px;
 }
@@ -202,7 +202,7 @@ div.switchContainer {
   margin-top: 20px;
 }
 
-form#addBookForm input:not(input[type="checkbox"]) {
+form.bookForm input:not(input[type="checkbox"]) {
   padding: 10px 0;
   width: 100%;
   border: none;
@@ -211,7 +211,7 @@ form#addBookForm input:not(input[type="checkbox"]) {
   font-size: 18px;
 }
 
-form#addBookForm input:not(input[type="checkbox"])::placeholder {
+form.bookForm input:not(input[type="checkbox"])::placeholder {
   font-size: 18px;
 }
 
@@ -220,7 +220,8 @@ form div.btnContainer {
   margin-top: 20px;
 }
 
-form .addBookBtn {
+form .addBookBtn,
+form .saveEditBtn {
   width: 100%;
   color: #fff;
   background: #333;
